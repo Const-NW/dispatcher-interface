@@ -1,4 +1,4 @@
-/*
+tr/*
  *  Project     Dispatcher-interface
  *  @author     Konstantin Malinin
  *  @link       github.com/Const-NW/dispatcher-interface
@@ -28,26 +28,24 @@
 
 #include "HID-Project.h"
 
-const int pin2Button = 2;
-const int pin3Button = 3;
-const int pin4Button = 4;
-const int pin5Button = 5;
-const int pin6Button = 6;
-const int pin7Button = 7;
-const int pin8Button = 8;
+const int pin1Button = 2;
+const int pin2Button = 3;
+const int pin3Button = 4;
+const int pin4Button = 5;
+const int pin5Button = 6;
+const int pinTalkButton = 18;
 
-const String copyright = "SELECTOR-ADAPTER-8CH v.1.0b. Copyright (c) 2021, Neoservice LTD, Russia, Petrozavodsk, info@neocom-karelia.ru";
+const String copyright = "Dispatcher-interface v.1.3b. Copyright (c) 2021, konstantin Malinin (MIT license), Russia, Petrozavodsk, konstantine.1988@gmail.com";
 
 const int delayTime = 300;
 
 void setup() {
+  pinMode(pin1Button, INPUT_PULLUP);
   pinMode(pin2Button, INPUT_PULLUP);
   pinMode(pin3Button, INPUT_PULLUP);
   pinMode(pin4Button, INPUT_PULLUP);
   pinMode(pin5Button, INPUT_PULLUP);
-  pinMode(pin6Button, INPUT_PULLUP);
-  pinMode(pin7Button, INPUT_PULLUP);
-  pinMode(pin8Button, INPUT_PULLUP);
+  pinMode(pinTalkButton, INPUT);
 
   Gamepad.begin();
   Gamepad.releaseAll();
@@ -60,36 +58,66 @@ void setup() {
 }
 
 void checkPinButton(int pinButton) {
-  if (!digitalRead(pinButton)) {
+
+  int channelNumber = pinButton - 1;
+  
+  int pinVal = !digitalRead(pinButton);
+  
+  if (pinVal) {
+    Gamepad.press(channelNumber);
+  }
+  else
+  {
+    Gamepad.release(channelNumber);
+  }
+  
+  Serial.print(channelNumber);
+  Serial.print(": ");
+  Serial.print(pinVal);
+  Serial.print("; ");
+  
+}
+
+void checkTalkButton(int pinButton) {
+
+  int pinVal = digitalRead(pinButton);
+  
+  if (pinVal) {
     Gamepad.press(pinButton);
-    Serial.print("Pressed:  ");
-    Serial.print(pinButton);
-    Serial.print("; ");
   }
-  else {
+  else
+  {
     Gamepad.release(pinButton);
-    Serial.print("Released: ");
-    Serial.print(pinButton);
-    Serial.print("; ");
   }
+
+  Serial.print(pinButton);
+  Serial.print(": ");
+  Serial.print(pinVal);
+  Serial.print("; ");
+
+  int pinAnalogVal = analogRead(pinButton);
+
+  Serial.print(pinButton);
+  Serial.print("A: ");
+  Serial.print(pinAnalogVal);
+  Serial.print("; ");
 }
 
 void loop() {
   
+  checkPinButton(pin1Button);
   checkPinButton(pin2Button);
   checkPinButton(pin3Button);
   checkPinButton(pin4Button);
   checkPinButton(pin5Button);
-  checkPinButton(pin6Button);
-  checkPinButton(pin7Button);
-  checkPinButton(pin8Button);
+  
+  checkTalkButton(pinTalkButton);
   
   Gamepad.write();
 
-  Serial.print("Sended information to HID. Delay: ");
+  Serial.print("sended information to HID. Delay: ");
   Serial.print(delayTime);
-  Serial.print(". ");
-  Serial.println(copyright);
-  
+  Serial.println(". ");
+ 
   delay(delayTime);
 }
