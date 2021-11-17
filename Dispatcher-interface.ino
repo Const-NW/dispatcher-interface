@@ -1,4 +1,4 @@
-tr/*
+/*
  *  Project     Dispatcher-interface
  *  @author     Konstantin Malinin
  *  @link       github.com/Const-NW/dispatcher-interface
